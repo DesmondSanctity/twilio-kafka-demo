@@ -1,10 +1,7 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import { Kafka } from 'kafkajs';
 import { faker } from '@faker-js/faker';
 import cron from 'node-cron';
-
-dotenv.config();
 
 const app = express();
 app.use(express.json());
@@ -32,7 +29,7 @@ async function sendToKafka(data) {
    ),
   }));
   await producer.send({
-   topic: 'weather-data',
+   topic: 'transaction-data',
    messages,
   });
  } catch (error) {
