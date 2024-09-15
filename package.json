@@ -1,0 +1,29 @@
+{
+  "name": "twilio-kafka-demo",
+  "version": "1.0.0",
+  "description": "Learn how to build data streaming pipelines with Apache Kafka and how to ingest data streams in an app in a scalable way while integrating Twilio messaging.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "twilio",
+    "kafka",
+    "streaming",
+    "data",
+    "pipelines"
+  ],
+  "author": "Desmond Obisi",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "kafkajs": "^2.2.4",
+    "mongoose": "^8.6.2",
+    "node-cron": "^3.0.3",
+    "twilio": "^5.3.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.0.1"
+  }
+}
