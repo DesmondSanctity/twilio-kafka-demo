@@ -1,5 +1,5 @@
 import express from 'express';
-import { Kafka } from 'kafkajs';
+import { Kafka, Partitioners } from 'kafkajs';
 import { faker } from '@faker-js/faker';
 import cron from 'node-cron';
 
@@ -12,7 +12,11 @@ const kafka = new Kafka({
  brokers: ['kafka:29092'],
 });
 
-const producer = kafka.producer();
+const producer = kafka.producer({
+ retry: {
+  retries: 8, // Increase the number of retries
+ }
+});
 
 // Add health check route
 app.get('/health', (req, res) => {
@@ -45,7 +49,8 @@ const generateTransactions = async () => {
  for (let i = 0; i < 20; i++) {
   let transaction = {
    id: faker.string.uuid(),
-   amount: faker.finance.amount(100, 10000, 2),
+   amount: faker.number.int({ min: 1000, max: 5000000 }),
+   fullName: faker.person.fullName(),
    accountName: faker.finance.accountName(),
    accountNumber: faker.finance.accountNumber(5),
    timestamp: new Date().toISOString(),

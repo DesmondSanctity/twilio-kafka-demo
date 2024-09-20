@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { Kafka } from 'kafkajs';
 import twilio from 'twilio';
 import mongoose from 'mongoose';
+import Transaction from './model.js';
 
 dotenv.config();
 
@@ -31,7 +32,6 @@ const twilioClient = new twilio(accountSid, authToken);
 // MongoDB configuration
 const mongoUrl = process.env.MONGO_URL;
 const dbName = process.env.DB_NAME;
-let db;
 
 // Mongoose connection to MongoDB
 mongoose
@@ -53,22 +53,22 @@ const sendAlert = async (transaction) => {
  await twilioClient.messages
   .create({
    body: message,
-   from: 'your_twilio_phone_number',
-   to: 'recipient_phone_number',
+   from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+   to: `whatsapp:${process.env.ALERT_WHATSAPP_NUMBER}`,
   })
   .then((message) => console.log('Alert sent:', message.sid))
   .catch((err) => console.error('Error sending alert:', err));
 };
 
 // Save transaction to MongoDB
-const saveTransactionToMongo = async (transaction) => {
- const collection = await db.collection('transactions');
- collection
-  .insertOne(transaction)
-  .then((result) =>
-   console.log('Transaction saved to MongoDB:', result.insertedId)
-  )
-  .catch((err) => console.error('Error saving transaction to MongoDB:', err));
+const saveTransactionToMongo = async (transactionData) => {
+ try {
+  const transaction = new Transaction(transactionData);
+  await transaction.save();
+  console.log('Transaction saved to MongoDB:', transaction._id);
+ } catch (err) {
+  console.error('Error saving transaction to MongoDB:', err);
+ }
 };
 
 const processMessage = async (message) => {
@@ -79,7 +79,7 @@ const processMessage = async (message) => {
  await saveTransactionToMongo(transaction);
 
  // Send an alert for high-value transactions
- if (transaction.amount > 5000000) {
+ if (transaction.amount >= 4000000) {
   await sendAlert(transaction);
  }
 };
@@ -95,11 +95,6 @@ const startConsumer = async () => {
   },
  });
 };
-
-// Handle consumer errors
-consumer.on('error', (err) => {
- console.error('Consumer error:', err);
-});
 
 process.on('SIGINT', async () => {
  console.log('Shutting down gracefully...');
