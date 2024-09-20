@@ -42,6 +42,9 @@ build/Release
 node_modules/
 jspm_packages/
 
+# Docker data volumes
+mongodb_data/
+
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
 
